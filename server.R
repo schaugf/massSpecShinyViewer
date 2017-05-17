@@ -7,24 +7,27 @@ library(shiny)
 library(ggplot2)
 
 source('massSpecUtils.R')
-
+#setwd('~/Dropbox/projects/johnsProteins/massSpecShinyViewer/')
 dat <- read.csv(file.path('data', 'sampleData.csv'))
 uniprot <- read.csv(file.path('data', 'uniprotList.tab'), sep='\t')
 f_uniprot <- .FormatUniprot()
-
-data.cols <- c('Counter','Accession','Description','Sum_Coverage',
-              'Sum_Proteins','Sum_UniquePeptides','Sum_Peptides',
-              'Sum_PSMs','PeptidesA2','PeptidesB2','PeptidesC2',
-              'PSMA2','PSMB2','PSMC2','CoverageA2','CoverageB2',
-              'CoverageC2','ScoreA2','ScoreB2','ScoreC2','AAs','MW_kDa','calc.pl')
-colnames(dat) <- data.cols
+allGoTerms <- .GetAllGOTerms()
+dat.fields <- colnames(dat)
 
 shinyServer(function(input, output) {
-
+  
+  output$datFields <- renderUI({
+    selectInput('variable', 'Choose Variable:', dat.fields) 
+  })
+  
+  output$goTerms <- renderUI({
+    selectInput('go_term', 'Select GO Term:', c('All',allGoTerms))
+  })
+  
   goTermText <- reactive({
     input$go_term
   })
-
+  
   output$caption <- renderText({
     goTermText()
   })

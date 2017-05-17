@@ -8,30 +8,14 @@
 
 library(shiny)
 
-data.cols <- c('Counter','Accession','Description','Sum_Coverage',
-               'Sum_Proteins','Sum_UniquePeptides','Sum_Peptides',
-               'Sum_PSMs','PeptidesA2','PeptidesB2','PeptidesC2',
-               'PSMA2','PSMB2','PSMC2','CoverageA2','CoverageB2',
-               'CoverageC2','ScoreA2','ScoreB2','ScoreC2','AAs','MW_kDa','calc.pl')
-
-dat.num.cols <- c('Sum_Proteins','Sum_UniquePeptides','Sum_Peptides',
-                  'Sum_PSMs','PeptidesA2','PeptidesB2','PeptidesC2',
-                  'PSMA2','PSMB2','PSMC2','ScoreA2','ScoreB2','ScoreC2',
-                  'AAs','MW_kDa','calc.pl')
-
-allGoTerms <- .GetAllGOTerms()
-
 fluidPage(
   titlePanel('Mass Spec Visualization Tool'),
   sidebarLayout(
     sidebarPanel(
       
-      selectInput("variable", "Choose a variable:", 
-                  choices = dat.num.cols),
+      uiOutput('datFields'),
       
-      selectInput("go_term", "Choose a GO term:", 
-                  choices = c('All', allGoTerms), 
-                  'All'),
+      uiOutput('goTerms'),
       
       sliderInput("bins",
                   "Number of bins:",
