@@ -5,6 +5,7 @@
 
 library(shiny)
 library(ggplot2)
+library(RColorBrewer)
 
 source("massSpecUtils.R")
 
@@ -26,7 +27,7 @@ shinyServer(function(input, output) {
   })
   
   goTermText <- reactive({
-    input$go_term
+    paste0(input$go_term, ' (',nrow(.SubsetDataByGO(dat,f_uniprot,input$go_term)),' proteins)')
   })
   
   output$caption <- renderText({
@@ -35,9 +36,17 @@ shinyServer(function(input, output) {
   
   output$distPlot <- renderPlot({
     pd <- .SubsetDataByGO(dat,f_uniprot,input$go_term)
+    pd <- pd[,c(2,9:11)]  # only need protein counts
+    pd <- melt.data.frame(pd,id.vars='Accession')
+    
     p <- ggplot(pd) + 
-      geom_histogram(aes_string(x=input$variable), bins=input$bins)
-    p
-  })
+      geom_violin(aes(variable,value,fill=variable)) +
+      geom_dotplot(aes(variable,value),binaxis = 'y',stackdir='center',dotsize = .2,stackratio = .1) +
+      xlab('') +
+      ylab('# Peptides') +
+      scale_fill_manual(values = c('pink','lightblue','lightgreen'))
 
+    p
+    
+  })
 })
