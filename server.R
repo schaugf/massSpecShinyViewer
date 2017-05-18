@@ -4,6 +4,7 @@
 #runApp('massSpecShinyViewer')
 
 library(shiny)
+library(reshape)
 library(ggplot2)
 library(RColorBrewer)
 
