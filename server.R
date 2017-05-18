@@ -1,21 +1,22 @@
 # Server for Mass Spec Data Visualization
 # Geoffrey F. Schau
 
-#runApp('massSpec')
+#runApp('massSpecShinyViewer')
 
 library(shiny)
 library(ggplot2)
 
-source('massSpecUtils.R')
-#setwd('~/Dropbox/projects/johnsProteins/massSpecShinyViewer/')
-dat <- read.csv(file.path('data', 'sampleData.csv'))
-uniprot <- read.csv(file.path('data', 'uniprotList.tab'), sep='\t')
-f_uniprot <- .FormatUniprot()
-allGoTerms <- .GetAllGOTerms()
+source("massSpecUtils.R")
+
+dat <- read.csv('data/sampleData.csv')
+uniprot <- read.csv('data/uniprotList.tab', sep='\t')
+
+f_uniprot <- .FormatUniprot(uniprot)
+allGoTerms <- .GetAllGOTerms(f_uniprot)
 dat.fields <- colnames(dat)
 
 shinyServer(function(input, output) {
-  
+
   output$datFields <- renderUI({
     selectInput('variable', 'Choose Variable:', dat.fields) 
   })
@@ -33,7 +34,7 @@ shinyServer(function(input, output) {
   })
   
   output$distPlot <- renderPlot({
-    pd <- .SubsetDataByGO(input$go_term)
+    pd <- .SubsetDataByGO(dat,f_uniprot,input$go_term)
     p <- ggplot(pd) + 
       geom_histogram(aes_string(x=input$variable), bins=input$bins)
     p

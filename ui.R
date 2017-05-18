@@ -1,4 +1,4 @@
-# UI for Mass Spec Data Visulization
+c# UI for Mass Spec Data Visulization
 # Geoffrey F. Schau
 
 # Layout Description
@@ -10,6 +10,7 @@ library(shiny)
 
 fluidPage(
   titlePanel('Mass Spec Visualization Tool'),
+  
   sidebarLayout(
     sidebarPanel(
       
@@ -28,6 +29,5 @@ fluidPage(
       h3(textOutput("caption")) ,
       plotOutput("distPlot")
     )
-    
   )
 )
