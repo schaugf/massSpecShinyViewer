@@ -13,12 +13,17 @@ fluidPage(
   
   sidebarLayout(
     sidebarPanel(
+      fileInput('dataFile','Select Data File:', 
+                accept = c("text/csv",
+                           "text/comma-separated-values,text/plain",
+                           ".csv")),
       uiOutput('goTerms')
     ),
     
     mainPanel(
-      h3(textOutput("caption")) ,
-      plotOutput("distPlot")
+      h3(textOutput('caption')) ,
+      plotOutput('distPlot'),
+      dataTableOutput('pepCount')
     )
   )
 )

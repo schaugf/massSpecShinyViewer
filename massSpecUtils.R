@@ -44,6 +44,9 @@
   .allGOterms
 }
 
+.DoStatists <- function() {
+  
+}
 
 
   

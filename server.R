@@ -10,20 +10,21 @@ library(RColorBrewer)
 
 source("massSpecUtils.R")
 
-dat <- read.csv('data/sampleData.csv')
-uniprot <- read.csv('data/uniprotList.tab', sep='\t')
+dat <- read.csv('~/Dropbox/projects/massSpecShinyViewer/data/sampleData.csv')
+dat.fields <- colnames(dat)
 
+uniprot <- read.csv('data/uniprotList.tab', sep='\t')
 f_uniprot <- .FormatUniprot(uniprot)
 allGoTerms <- .GetAllGOTerms(f_uniprot)
-dat.fields <- colnames(dat)
 
 shinyServer(function(input, output) {
 
-  output$datFields <- renderUI({
-    selectInput('variable', 'Choose Variable:', dat.fields) 
-  })
-  
-  output$goTerms <- renderUI({
+  # in.dat <- reactive({read.csv(input$dataFile$datapath,
+  #                              header = input$header,
+  #                              sep = input$sep,
+  #                              quote = input$quote)})
+  # 
+    output$goTerms <- renderUI({
     selectInput('go_term', 'Select GO Term:', c('All',allGoTerms))
   })
   
@@ -36,18 +37,48 @@ shinyServer(function(input, output) {
   })
   
   output$distPlot <- renderPlot({
+    #dat <- in.dat()
+    
+    #in.file <- input$dataFile
+    #if (is.null(in.file))
+    #  return(NULL)
+    
+    # dat <- read.csv(in.file$datapath, header=input$header)
+    # dat.fields <- colnames(dat)
+    
     pd <- .SubsetDataByGO(dat,f_uniprot,input$go_term)
-    pd <- pd[,c(2,9:11)]  # only need protein counts
+    pd <- pd[,c(2,9:11)]
     pd <- melt.data.frame(pd,id.vars='Accession')
     
-    p <- ggplot(pd) + 
-      geom_violin(aes(variable,value,fill=variable)) +
+    titleText <- 'Not enough data to compute significance'
+    comp1 <- try(t.test(pd$value[pd$variable=='X..Peptides.A2'],pd$value[pd$variable=='X..Peptides.B2']))
+    comp2 <- try(t.test(pd$value[pd$variable=='X..Peptides.A2'],pd$value[pd$variable=='X..Peptides.C2']))
+    comp3 <- try(t.test(pd$value[pd$variable=='X..Peptides.B2'],pd$value[pd$variable=='X..Peptides.C2']))
+    
+    try(if (comp1$p.value & comp2$p.value & comp3$p.value) {
+      titleText <- try(paste('Student t-test P-values: \n A2 : B2 = ',
+                             round(comp1$p.value,3), '\n A2 : C2 = ',
+                             round(comp2$p.value,3), '\n B2 : C2 = ',
+                             round(comp3$p.value,3)))
+    })
+    
+    p <- ggplot(pd) +
+      geom_violin(aes(variable,value,fill=variable),adjust=4) +
       geom_dotplot(aes(variable,value),binaxis = 'y',stackdir='center',dotsize = .2,stackratio = .1) +
       xlab('') +
       ylab('# Peptides') +
-      scale_fill_manual(values = c('pink','lightblue','lightgreen'))
-
+      scale_fill_manual(values = c('pink','lightblue','lightgreen')) +
+      expand_limits(y=0) +
+      ggtitle(titleText)
     p
+  })
+  
+  output$pepCount <- renderDataTable({
+    # sorted by total peptide counts
+    pd <- dat[,c(2,3,6)]
     
+    names(pd) <- c('Accession','Description','SumUniquePeptides')
+    pd_sort <- pd[order(pd$SumUniquePeptides,decreasing=T),]
+    pd_sort
   })
 })
