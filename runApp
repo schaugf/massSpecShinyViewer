@@ -1,6 +1,4 @@
-# Navigate to directory massSpecShinyViewer
-# Run from the terminal with
-# ./runApp
+#!/bin/bash
 
 cd ..
 R -e "shiny::runApp('massSpecShinyViewer',launch.browser=TRUE)"

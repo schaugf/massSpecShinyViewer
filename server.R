@@ -10,7 +10,7 @@ library(RColorBrewer)
 
 source("massSpecUtils.R")
 
-dat <- read.csv('~/Dropbox/projects/massSpecShinyViewer/data/sampleData.csv')
+dat <- read.csv('data/sampleData.csv')
 dat.fields <- colnames(dat)
 
 uniprot <- read.csv('data/uniprotList.tab', sep='\t')
@@ -75,7 +75,8 @@ shinyServer(function(input, output) {
   
   output$pepCount <- renderDataTable({
     # sorted by total peptide counts
-    pd <- dat[,c(2,3,6)]
+    pd <- .SubsetDataByGO(dat,f_uniprot,input$go_term)
+    pd <- pd[,c(2,3,6)]
     
     names(pd) <- c('Accession','Description','SumUniquePeptides')
     pd_sort <- pd[order(pd$SumUniquePeptides,decreasing=T),]
