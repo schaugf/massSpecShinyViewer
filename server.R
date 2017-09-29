@@ -76,10 +76,10 @@ shinyServer(function(input, output) {
   output$pepCount <- renderDataTable({
     # sorted by total peptide counts
     pd <- .SubsetDataByGO(dat,f_uniprot,input$go_term)
-    pd <- pd[,c(2,3,6)]
+    pd <- pd[,c(2,3,6,9,10,11)]
     
-    names(pd) <- c('Accession','Description','SumUniquePeptides')
-    pd_sort <- pd[order(pd$SumUniquePeptides,decreasing=T),]
+    names(pd) <- c('Accession','Description','UniquePeptides','A2','B2','C2')
+    pd_sort <- pd[order(pd$UniquePeptides,decreasing=T),]
     pd_sort
   })
 })
