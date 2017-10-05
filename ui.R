@@ -17,7 +17,8 @@ fluidPage(
                 accept = c("text/csv",
                            "text/comma-separated-values,text/plain",
                            ".csv")),
-      uiOutput('goTerms')
+      uiOutput('goTerms'),
+      dataTableOutput('go_protein_count')
     ),
     
     mainPanel(

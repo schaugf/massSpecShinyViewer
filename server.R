@@ -24,7 +24,7 @@ shinyServer(function(input, output) {
   #                              sep = input$sep,
   #                              quote = input$quote)})
   # 
-    output$goTerms <- renderUI({
+  output$goTerms <- renderUI({
     selectInput('go_term', 'Select GO Term:', c('All',allGoTerms))
   })
   
@@ -77,9 +77,27 @@ shinyServer(function(input, output) {
     # sorted by total peptide counts
     pd <- .SubsetDataByGO(dat,f_uniprot,input$go_term)
     pd <- pd[,c(2,3,6,9,10,11)]
-    
     names(pd) <- c('Accession','Description','UniquePeptides','A2','B2','C2')
+    
     pd_sort <- pd[order(pd$UniquePeptides,decreasing=T),]
     pd_sort
   })
+  
+  output$go_protein_count <- renderDataTable({
+    goCounts <- array(dim=length(allGoTerms),data=0)
+    pepCounts <- array(dim=length(allGoTerms),data=0)
+    for (i in 1:length(allGoTerms)){
+      l_dat <- .SubsetDataByGO(dat,f_uniprot,allGoTerms[i])
+      goCounts[i] <- nrow(l_dat)
+      pepCounts[i] <- sum(l_dat$Sum...Unique.Peptides.)
+    }
+    ord <- order(pepCounts, decreasing=T)
+    gt_o <- allGoTerms[ord]
+    go_o <- goCounts[ord]
+    gp_o <- pepCounts[ord]
+    pd <- data.frame(gt_o, go_o, gp_o)
+    names(pd) <- c('GoTerm','ProteinCount','UniquePeptideCount')
+    pd
+  })
+  
 })

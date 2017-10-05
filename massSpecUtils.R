@@ -44,7 +44,7 @@
   .allGOterms
 }
 
-.DoStatists <- function() {
+.GetGOPeptideCounts <- function() {
   
 }
 
